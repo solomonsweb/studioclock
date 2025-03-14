@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Radio Control Panel</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&display=swap');
+        
         body {
             margin: 0;
             background-color: black;
@@ -12,6 +14,7 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
+            font-family: 'Courier Prime', monospace;
         }
         .container {
             display: flex;
@@ -22,6 +25,27 @@
             font-size: 4rem;
             text-align: center;
             width: 300px;
+            position: relative;
+        }
+        .seconds-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-90deg);
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+        .dot {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: white;
+            border-radius: 50%;
         }
         .buttons {
             display: flex;
@@ -37,11 +61,25 @@
             cursor: pointer;
             width: 200px;
         }
+        .fullscreen {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: black;
+            color: white;
+            border: 2px solid white;
+            padding: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="clock" id="clock">--:--<br>--</div>
+        <div class="clock" id="clock">--:--<br>--
+            <div class="seconds-ring" id="seconds-ring"></div>
+        </div>
         <div class="buttons">
             <div class="button" id="mic">MIC</div>
             <div class="button" id="phone">PHONE</div>
@@ -49,31 +87,51 @@
             <div class="button" id="door">DOOR</div>
         </div>
     </div>
+    <button class="fullscreen" onclick="toggleFullScreen()">Fullscreen</button>
     <script>
         function updateTime() {
             const now = new Date();
             const gmtTime = new Date(now.toUTCString());
             const hours = gmtTime.getUTCHours().toString().padStart(2, '0');
             const minutes = gmtTime.getUTCMinutes().toString().padStart(2, '0');
-            const seconds = gmtTime.getUTCSeconds().toString().padStart(2, '0');
-            document.getElementById("clock").innerHTML = `${hours}:${minutes}<br>${seconds}`;
+            const seconds = gmtTime.getUTCSeconds();
+            document.getElementById("clock").innerHTML = `${hours}:${minutes}<br>${seconds.toString().padStart(2, '0')}`;
+            updateSecondsRing(seconds);
         }
-        setInterval(updateTime, 1000);
-        updateTime();
 
-        const buttons = {
-            '1': { element: document.getElementById('mic'), color: 'red' },
-            '2': { element: document.getElementById('phone'), color: 'yellow' },
-            '3': { element: document.getElementById('onAir'), color: 'green' },
-            '4': { element: document.getElementById('door'), color: 'cyan' }
-        };
-
-        document.addEventListener('keydown', (event) => {
+        function updateSecondsRing(seconds) {
+            const ring = document.getElementById("seconds-ring");
+            ring.innerHTML = "";
+            for (let i = 0; i < 60; i++) {
+                const dot = document.createElement("div");
+                dot.classList.add("dot");
+                const angle = (i / 60) * 360;
+                const x = 90 + 80 * Math.cos((angle * Math.PI) / 180);
+                const y = 90 + 80 * Math.sin((angle * Math.PI) / 180);
+                dot.style.transform = `translate(${x}px, ${y}px)`;
+                dot.style.backgroundColor = i < seconds ? "white" : "gray";
+                document.querySelector(".buttons").appendChild(document.createElement("div")).appendChild(document.createElement("div"));
+            }
+        }
+        
+        function toggleColor(button, color) {
+            button.style.backgroundColor = (button.style.backgroundColor === color) ? "grey" : color;
+        }
+        
+        document.addEventListener("keydown", (event) => {
             if (buttons[event.key]) {
                 const button = buttons[event.key].element;
                 button.style.backgroundColor = (button.style.backgroundColor === buttons[event.key].color) ? 'grey' : buttons[event.key].color;
             }
         });
+        
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
     </script>
 </body>
 </html>
