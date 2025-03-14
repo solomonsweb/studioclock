@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radio Control Panel</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            display: flex;
+            align-items: center;
+        }
+        .clock {
+            color: white;
+            font-size: 4rem;
+            text-align: center;
+            width: 300px;
+        }
+        .buttons {
+            display: flex;
+            flex-direction: column;
+        }
+        .button {
+            background-color: grey;
+            color: black;
+            font-size: 2rem;
+            padding: 20px;
+            margin: 10px;
+            text-align: center;
+            cursor: pointer;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="clock" id="clock">--:--<br>--</div>
+        <div class="buttons">
+            <div class="button" id="mic">MIC</div>
+            <div class="button" id="phone">PHONE</div>
+            <div class="button" id="onAir">ON AIR</div>
+            <div class="button" id="door">DOOR</div>
+        </div>
+    </div>
+    <script>
+        function updateTime() {
+            const now = new Date();
+            const gmtTime = new Date(now.toUTCString());
+            const hours = gmtTime.getUTCHours().toString().padStart(2, '0');
+            const minutes = gmtTime.getUTCMinutes().toString().padStart(2, '0');
+            const seconds = gmtTime.getUTCSeconds().toString().padStart(2, '0');
+            document.getElementById("clock").innerHTML = `${hours}:${minutes}<br>${seconds}`;
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        const buttons = {
+            '1': { element: document.getElementById('mic'), color: 'red' },
+            '2': { element: document.getElementById('phone'), color: 'yellow' },
+            '3': { element: document.getElementById('onAir'), color: 'green' },
+            '4': { element: document.getElementById('door'), color: 'cyan' }
+        };
+
+        document.addEventListener('keydown', (event) => {
+            if (buttons[event.key]) {
+                const button = buttons[event.key].element;
+                button.style.backgroundColor = (button.style.backgroundColor === buttons[event.key].color) ? 'grey' : buttons[event.key].color;
+            }
+        });
+    </script>
+</body>
+</html>
